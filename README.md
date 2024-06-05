@@ -1,50 +1,9 @@
-# Welcome to your Expo app 👋
+# TurboTron32
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+## Introduction
 
-## Get started
+Ce projet est réalisé dans le cadre d’un projet de fin d'année au sein de l’école HETIC. Il s’agit de la réalisation d’une course de voiture électrique où le but est de faire le meilleur temps par rapport aux autres groupes d’étudiants. Notre projet, Turbo Tron 32, est une application innovante de course de voitures. Notre équipe est composée de Valérie Song, Maxime Ait Adda, Rémi Petit, William Tam, David Pikusa, Jeanne Bissinga et Pierre Leroy.
 
-1. Install dependencies
+Le projet HETIC Web 3 Tech Race consiste en deux challenges : un où notre équipe contrôle le véhicule via une application que nous avons développée, et un autre où la voiture doit se repérer seule sur un parcours prédéfini. Notre application permettra aux utilisateurs de contrôler la voiture, de visualiser les statistiques en temps réel, de suivre les données de course et de visualiser la course depuis la caméra embarquée.
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-    npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Notre projet se divise en deux parties : le niveau 1, où nous développons une application mobile pour contrôler le véhicule et afficher les statistiques en temps réel, et le niveau 2, où nous permettons à la voiture de fonctionner en totale autonomie et de remporter la course.
