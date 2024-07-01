@@ -5,7 +5,7 @@ export const indexStyles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'black',
+    backgroundColor: 'white',
   },
   logo: {
     width: 350,
