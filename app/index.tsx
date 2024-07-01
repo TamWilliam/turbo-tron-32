@@ -1,15 +1,23 @@
-import { Text, View } from "react-native";
+import React from 'react';
+import { Text, View, Image, TouchableOpacity } from 'react-native';
+import { indexStyles } from './IndexStyles';
 
 export default function Index() {
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Edit app/index.tsx to edit this screen.</Text>
+    <View style={indexStyles.container}>
+      <Image
+        source={require('./assets/images/logo_turbotron32.png')}
+        style={indexStyles.logo}
+      />
+      <Text style={indexStyles.text}>Connectez votre véhicule pour commencer</Text>
+      <TouchableOpacity
+        style={indexStyles.button}
+        onPress={() => {
+          console.log('Bouton cliqué');
+        }}
+      >
+        <Text style={indexStyles.buttonText}>Commencer</Text>
+      </TouchableOpacity>
     </View>
   );
 }
