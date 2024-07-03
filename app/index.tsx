@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, View, Image, TouchableOpacity } from 'react-native';
-import { indexStyles } from './IndexStyles';
+import { indexStyles } from './indexStyles';
 
 export default function Index() {
   return (
