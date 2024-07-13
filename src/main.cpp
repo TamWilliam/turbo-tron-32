@@ -21,15 +21,15 @@
 // https://randomnerdtutorials.com/esp32-static-fixed-ip-address-arduino-ide/
 // https://github.com/Freenove/Freenove_4WD_Car_Kit_for_ESP32/tree/master
 
-char *ssid_wifi = "Denji 3.0";            // Le nom du réseau WiFi
-char *password_wifi = "dawarchat"; // Le password du WiFi
+char *ssid_wifi = "Tenda_EXT";            // Le nom du réseau WiFi
+char *password_wifi = "doremi2711"; // Le password du WiFi
 
-const char *mqtt_server = "192.168.122.98"; // L'IP de votre broker MQTT
-const int mqtt_interval_ms = 5000;          // L'interval en ms entre deux envois de données
+const char *mqtt_server = "82.64.159.229"; // L'IP de votre broker MQTT
+const int mqtt_interval_ms = 1000;          // L'interval en ms entre deux envois de données
 
-IPAddress localIP(192, 168, 122, 50); // l'IP que vous voulez donner à votre voiture
+IPAddress localIP(192, 168, 0, 50); // l'IP que vous voulez donner à votre voiture
 
-IPAddress localGateway(192, 168, 122, 99); // L'IP de la gateway de votre réseau
+IPAddress localGateway(192, 168, 0, 254); // L'IP de la gateway de votre réseau
 IPAddress localSubnet(255, 255, 255, 0);  // Le masque de sous réseau
 
 IPAddress primaryDNS(8, 8, 8, 8);
@@ -43,7 +43,7 @@ PubSubClient client(espClient);
 
 WiFiServer server_Cmd(4000);
 WiFiServer server_Camera(7000);
-bool videoFlag = 0;
+bool videoFlag = 1;
 
 long last_message = 0;
 
@@ -110,25 +110,23 @@ void setup()
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) { 
         camera_fb_t *fb = NULL;
         fb = esp_camera_fb_get();
-                if (fb != NULL)
-                {
-                    uint8_t slen[4];
-                    slen[0] = fb->len >> 0;
-                    slen[1] = fb->len >> 8;
-                    slen[2] = fb->len >> 16;
-                    slen[3] = fb->len >> 24;
-                    AsyncResponseStream *response = request->beginResponseStream("image");
-                    // response->write(slen, 4);
-                    response->write(fb->buf, fb->len);
-                    request->send(response);
-                    // client.write(slen, 4);
-                    // client.write(fb->buf, fb->len);
-                    // request->send_P(200, "application/octet-stream", fb->buf, fb->len);
-                    // request->send(fb->buf, "application/octet-stream", fb->len);
-                    // Serial.println("Camera send");
-                    esp_camera_fb_return(fb);
-                    fb = NULL;
-                } });
+        if (fb != NULL)
+        {
+            uint8_t slen[4];
+            slen[0] = fb->len >> 0;
+            slen[1] = fb->len >> 8;
+            slen[2] = fb->len >> 16;
+            slen[3] = fb->len >> 24;
+            AsyncResponseStream *response = request->beginResponseStream("image");
+            response->write(fb->buf, fb->len);
+            request->send(response);
+            esp_camera_fb_return(fb);
+            fb = NULL;
+        } 
+        else {
+            request->send(500, "text/plain", "Camera capture failed");
+        }
+    });
 
     server.begin();
 
@@ -326,45 +324,6 @@ void reconnect()
         }
     }
 }
-
-// void loopTask_Camera(void *pvParameters)
-// {
-//     while (1)
-//     {
-//         WiFiClient wf_client = server_Camera.available(); // listen for incoming clients
-//         if (wf_client)
-//         { // if you get a client
-//             Serial.println("Camera_Server connected to a client.");
-//             if (wf_client.connected())
-//             {
-//                 camera_fb_t *fb = NULL;
-//                 while (wf_client.connected())
-//                 { // loop while the client's connected
-//                     if (videoFlag == 0)
-//                     {
-//                         fb = esp_camera_fb_get();
-//                         if (fb != NULL)
-//                         {
-//                             uint8_t slen[4];
-//                             slen[0] = fb->len >> 0;
-//                             slen[1] = fb->len >> 8;
-//                             slen[2] = fb->len >> 16;
-//                             slen[3] = fb->len >> 24;
-//                             wf_client.write(slen, 4);
-//                             wf_client.write(fb->buf, fb->len);
-//                             Serial.println("Camera send");
-//                             esp_camera_fb_return(fb);
-//                         }
-//                     }
-//                 }
-//                 // close the connection:
-//                 wf_client.stop();
-//                 Serial.println("Camera Client Disconnected.");
-//                 ESP.restart();
-//             }
-//         }
-//     }
-// }
 
 void loopTask_Camera(void *pvParameters)
 {
