@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, Button } from "react-native";
 import { ReactNativeJoystick } from "@korsolutions/react-native-joystick";
 
@@ -15,12 +15,12 @@ const App = () => {
   const [dist, setDistance] = useState(0);
   const [message, setMessage] = useState("Connecting...");
   const [speed, setSpeed] = useState(0);
-  const [isRaceActive, setIsRaceActive] = useState(false); // Nouvel état pour la course
-  const [totalDistance, setTotalDistance] = useState(0); // Distance parcourue
-  const lastUpdateTimeRef = useRef(Date.now());
+  const [distanceTraveled, setDistanceTraveled] = useState(0);
+  const [isRacing, setIsRacing] = useState(false);
+  const [intervalId, setIntervalId] = useState(null);
 
   useEffect(() => {
-    const websocket = new WebSocket("ws://192.168.225.240/ws"); // à changer selon l'adresse IP affiliée à la voiture
+    const websocket = new WebSocket("ws://192.168.225.240/ws");
 
     websocket.onopen = () => {
       console.log("Connected to WebSocket server");
@@ -110,7 +110,7 @@ const App = () => {
 
   useEffect(() => {
     let commandData = interpolateData(dataAngle);
-    if (dist === 0 || !isRaceActive) {
+    if (dist === 0) {
       commandData = commandData.map(() => 0);
     } else {
       commandData = commandData.map((value) =>
@@ -123,33 +123,47 @@ const App = () => {
       data: commandData,
     });
 
-    // calcul vitesse
+    // calcul de la vitesse
     const maxValue = Math.max(...commandData.map(Math.abs));
     const maxSpeedKmH = 10;
     const currentSpeed = (maxValue / 4095) * maxSpeedKmH;
     setSpeed(currentSpeed);
+  }, [joystickCoordsRepere]);
 
-    // calcul de la distance parcourue
-    const now = Date.now();
-    const timeElapsedInSeconds = (now - lastUpdateTimeRef.current) / 1000;
-    lastUpdateTimeRef.current = now;
+  // distance parcourue
+  useEffect(() => {
+    if (isRacing && speed > 0) {
+      const id = setInterval(() => {
+        setDistanceTraveled((prevDistance) => prevDistance + speed / 3600);
+      }, 1000);
 
-    if (isRaceActive) {
-      const distanceTraveled = (currentSpeed * timeElapsedInSeconds) / 3600; // km
-      setTotalDistance((prevDistance) => prevDistance + distanceTraveled);
+      setIntervalId(id);
+    } else if (!isRacing && intervalId) {
+      clearInterval(intervalId);
     }
-  }, [dataAngle, dist, isRaceActive]);
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [isRacing, speed]);
 
   const toggleRace = () => {
-    if (isRaceActive) {
-      // arrête la course
-      setIsRaceActive(false);
+    if (isRacing) {
+      setIsRacing(false);
     } else {
-      // lance une course
-      setIsRaceActive(true);
-      setTotalDistance(0); // reset distance parcourue
-      lastUpdateTimeRef.current = Date.now(); // reset temps de référence
+      setDistanceTraveled(0);
+      setIsRacing(true);
     }
+  };
+
+  const handleButtonPress = () => {
+    sendCommand({ cmd: 1, data: [0, 200, 4000, 4000] });
+
+    setTimeout(() => {
+      sendCommand({ cmd: 1, data: [0, 0, 0, 0] });
+    }, 500);
   };
 
   return (
@@ -182,11 +196,12 @@ const App = () => {
       <Text>Distance : ({dist.toFixed(2)})</Text>
       <Text>Data : [{data.join(", ")}]</Text>
       <Text>Vitesse : {speed.toFixed(2)} km/h</Text>
-      <Text>Distance parcourue : {totalDistance.toFixed(2)} km</Text>{" "}
+      <Text>Distance parcourue : {distanceTraveled.toFixed(2)} km</Text>{" "}
       <Button
-        title={isRaceActive ? "Arrêter la course" : "Commencer la course"}
+        title={isRacing ? "Arrêter la course" : "Commencer la course"}
         onPress={toggleRace}
       />
+      <Button title="Send Command" onPress={handleButtonPress} />
     </View>
   );
 };
