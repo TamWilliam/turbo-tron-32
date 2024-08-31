@@ -1,38 +1,41 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Button } from 'react-native';
-import { ReactNativeJoystick } from '@korsolutions/react-native-joystick';
+import React, { useEffect, useState } from "react";
+import { View, Text, Button } from "react-native";
+import { ReactNativeJoystick } from "@korsolutions/react-native-joystick";
 
 const App = () => {
   const [joystickCoords, setJoystickCoords] = useState({ x: 0, y: 0 });
-  const [joystickCoordsRepere, setJoystickCoordsRepere] = useState({ x2: 0, y2: 0 });
+  const [joystickCoordsRepere, setJoystickCoordsRepere] = useState({
+    x2: 0,
+    y2: 0,
+  });
   const [dataAngle, setDataAngle] = useState(0);
   const [radian, setRadian] = useState(0);
   const [ws, setWs] = useState(null);
   const [data, setData] = useState([0, 0, 0, 0]);
   const [dist, setDistance] = useState(0);
-  const [message, setMessage] = useState('Connecting...');
+  const [message, setMessage] = useState("Connecting...");
 
   useEffect(() => {
-    const websocket = new WebSocket('ws://192.168.36.180/ws'); // Remplacez par l'adresse IP de votre ESP32
+    const websocket = new WebSocket("ws://192.168.225.240/ws"); // Remplacez par l'adresse IP de votre ESP32
 
     websocket.onopen = () => {
-      console.log('Connected to WebSocket server');
+      console.log("Connected to WebSocket server");
       setWs(websocket);
-      setMessage('Connected');
+      setMessage("Connected");
     };
 
     websocket.onmessage = (event) => {
-      console.log('Received:', event.data);
+      console.log("Received:", event.data);
     };
 
     websocket.onclose = () => {
-      console.log('Disconnected from WebSocket server');
-      setMessage('Disconnected');
+      console.log("Disconnected from WebSocket server");
+      setMessage("Disconnected");
     };
 
     websocket.onerror = (error) => {
-      console.error('WebSocket error:', error);
-      setMessage('Error');
+      console.error("WebSocket error:", error);
+      setMessage("Error");
     };
 
     return () => {
@@ -80,16 +83,16 @@ const App = () => {
     { angle: 225, data: [-200, -200, -4000, -4000] },
     { angle: 270, data: [-4000, -4000, -4000, -4000] },
     { angle: 315, data: [-4000, -4000, -200, -200] },
-    { angle: 360, data: [1000, 1000, -1000, 1000] } // repeat the 0° value for simplicity
+    { angle: 360, data: [1000, 1000, -1000, 1000] }, // repeat the 0° value for simplicity
   ];
 
   const interpolateData = (theta) => {
     const lowerIndex = Math.floor(theta / 45);
     const upperIndex = (lowerIndex + 1) % angleDataMap.length;
-    
+
     const lowerAngle = angleDataMap[lowerIndex].angle;
     const upperAngle = angleDataMap[upperIndex].angle;
-    
+
     const lowerData = angleDataMap[lowerIndex].data;
     const upperData = angleDataMap[upperIndex].data;
 
@@ -108,35 +111,57 @@ const App = () => {
     if (dist === 0) {
       commandData = commandData.map(() => 0);
     } else {
-      commandData = commandData.map(value => parseFloat((value * (dist / 1.41)).toFixed(2)));
+      commandData = commandData.map((value) =>
+        parseFloat((value * (dist / 1.41)).toFixed(2))
+      );
     }
     setData(commandData);
     sendCommand({
       cmd: 1,
-      data: commandData
+      data: commandData,
     });
   }, [dataAngle]);
 
   const handleButtonPress = () => {
     // Envoyer la première commande
-    sendCommand({cmd: 1, data: [0, 200, 4000, 4000]});
+    sendCommand({ cmd: 1, data: [0, 200, 4000, 4000] });
 
     // Attendre 1 seconde, puis envoyer la seconde commande
     setTimeout(() => {
-      sendCommand({cmd: 1, data: [0, 0, 0, 0]});
+      sendCommand({ cmd: 1, data: [0, 0, 0, 0] });
     }, 500); // 1000 millisecondes = 1 seconde
   };
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#038ac9' }}>
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#038ac9",
+      }}
+    >
       <Text>{message}</Text> {/* Affichage de l'état de la connexion */}
-      <ReactNativeJoystick onMove={handleJoystickMove} onStop={handleJoystickMove} backgroundColor="#d9d9d9" color="#959292" radius={75} />
-      <Text>Coordonnées du joystick : ({joystickCoords.x.toFixed(2)}, {joystickCoords.y.toFixed(2)})</Text>
-      <Text>Coordonnées : ({joystickCoordsRepere.x2.toFixed(2)}, {joystickCoordsRepere.y2.toFixed(2)})</Text>
+      <ReactNativeJoystick
+        onMove={handleJoystickMove}
+        onStop={handleJoystickMove}
+        backgroundColor="#d9d9d9"
+        color="#959292"
+        radius={75}
+      />
+      <Text>
+        Coordonnées du joystick : ({joystickCoords.x.toFixed(2)},{" "}
+        {joystickCoords.y.toFixed(2)})
+      </Text>
+      <Text>
+        Coordonnées : ({joystickCoordsRepere.x2.toFixed(2)},{" "}
+        {joystickCoordsRepere.y2.toFixed(2)})
+      </Text>
       <Text>Angle : ({dataAngle})</Text>
       <Text>Radian : ({radian})</Text>
-      <Text>Distance : ({dist.toFixed(2)})</Text> {/* Affichage de la distance avec un formattage */}
-      <Text>Data : [{data.join(', ')}]</Text>
+      <Text>Distance : ({dist.toFixed(2)})</Text>{" "}
+      {/* Affichage de la distance avec un formattage */}
+      <Text>Data : [{data.join(", ")}]</Text>
       <Button title="Send Command" onPress={handleButtonPress} />
     </View>
   );

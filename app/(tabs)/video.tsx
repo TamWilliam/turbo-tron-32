@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from 'react';
-import { Text, View, StyleSheet } from 'react-native';
-import { Video } from 'expo-av';
+import React, { useEffect, useRef } from "react";
+import { Text, View, StyleSheet } from "react-native";
+import { Video } from "expo-av";
 
 const App = () => {
   const videoRef = useRef(null);
@@ -15,7 +15,9 @@ const App = () => {
       <Text style={styles.mainTitle}>AC Video Player</Text>
       <View style={{ flex: 1 }}>
         <Video
-          source={{ uri: 'https://www.aranacorp.com/wp-content/uploads/rovy-avoiding-obstacles.mp4' }} // Distant file
+          source={{
+            uri: "https://www.aranacorp.com/wp-content/uploads/rovy-avoiding-obstacles.mp4",
+          }} // Distant file
           ref={videoRef} // Store reference
           shouldPlay
           resizeMode="cover"
@@ -39,12 +41,12 @@ const styles = StyleSheet.create({
   mainTitle: {
     color: TEXT_COLOR,
     fontSize: 30,
-    textAlign: 'center',
+    textAlign: "center",
     borderBottomWidth: 2,
     borderBottomColor: ERROR_COLOR,
   },
   backgroundVideo: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     bottom: 0,
