@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Button } from "react-native";
+import { View, Text, Button, StyleSheet } from "react-native";
 import { ReactNativeJoystick } from "@korsolutions/react-native-joystick";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 const App = () => {
   const [joystickCoords, setJoystickCoords] = useState({ x: 0, y: 0 });
@@ -143,7 +144,6 @@ const App = () => {
 
       setIntervalId(id);
     } else {
-      // Arrêter l'intervalle si la course s'arrête ou si la vitesse est nulle
       clearInterval(intervalId);
     }
 
@@ -164,30 +164,94 @@ const App = () => {
   };
 
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "#038ac9",
-      }}
-    >
-      <Text>{message}</Text>
-      <ReactNativeJoystick
-        onMove={handleJoystickMove}
-        onStop={handleJoystickMove}
-        backgroundColor="#d9d9d9"
-        color="#959292"
-        radius={75}
-      />
-      <Text>Vitesse : {speed.toFixed(3)} km/h</Text>
-      <Text>Distance parcourue : {distanceTraveled.toFixed(3)} km</Text>{" "}
-      <Button
-        title={isRacing ? "Arrêter la course" : "Commencer la course"}
-        onPress={toggleRace}
-      />
+    <View style={styles.container}>
+      <View style={styles.joystickContainer}>
+        <ReactNativeJoystick
+          onMove={handleJoystickMove}
+          onStop={handleJoystickMove}
+          backgroundColor="#d9d9d9"
+          color="#959292"
+          radius={75}
+        />
+      </View>
+      <View style={styles.infoContainer}>
+        <View style={styles.circleContainer}>
+          <Text style={styles.labelText}>Vitesse</Text>
+          <View style={styles.circle}>
+            <Text style={styles.valueText}>{speed.toFixed(3)}</Text>
+          </View>
+        </View>
+        <View style={styles.circleContainer}>
+          <Text style={styles.labelText}>Distance</Text>
+          <View style={styles.circle}>
+            <Text style={styles.valueText}>{distanceTraveled.toFixed(3)}</Text>
+          </View>
+        </View>
+        <TouchableOpacity style={styles.playStopButton} onPress={toggleRace}>
+          <Text style={styles.buttonText}>{isRacing ? "❚❚" : "▶"}</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexDirection: "row",
+    backgroundColor: "#038ac9",
+  },
+  joystickContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    width: 100,
+    marginLeft: 50,
+  },
+  infoContainer: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "flex-end",
+    marginBottom: 10,
+    marginRight: 10,
+  },
+  circleContainer: {
+    alignItems: "center",
+    marginHorizontal: 10,
+  },
+  circle: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    borderWidth: 8,
+    borderColor: "white",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "transparent",
+  },
+  valueText: {
+    fontSize: 40,
+    color: "white",
+    fontWeight: "900",
+  },
+  labelText: {
+    fontSize: 28,
+    color: "white",
+    marginBottom: 8,
+  },
+  playStopButton: {
+    borderWidth: 8,
+    borderColor: "white",
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 50,
+  },
+});
 
 export default App;
