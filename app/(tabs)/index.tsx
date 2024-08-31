@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { View, Text, Button } from "react-native";
 import { ReactNativeJoystick } from "@korsolutions/react-native-joystick";
 
@@ -14,9 +14,13 @@ const App = () => {
   const [data, setData] = useState([0, 0, 0, 0]);
   const [dist, setDistance] = useState(0);
   const [message, setMessage] = useState("Connecting...");
+  const [speed, setSpeed] = useState(0);
+  const [isRaceActive, setIsRaceActive] = useState(false); // Nouvel état pour la course
+  const [totalDistance, setTotalDistance] = useState(0); // Distance parcourue
+  const lastUpdateTimeRef = useRef(Date.now());
 
   useEffect(() => {
-    const websocket = new WebSocket("ws://192.168.225.240/ws"); // Remplacez par l'adresse IP de votre ESP32
+    const websocket = new WebSocket("ws://192.168.225.240/ws"); // à changer selon l'adresse IP affiliée à la voiture
 
     websocket.onopen = () => {
       console.log("Connected to WebSocket server");
@@ -54,12 +58,10 @@ const App = () => {
     let { screenX, screenY } = data.position;
     const { degree, radian } = data.angle;
 
-    // Calcul de la distance par rapport à l'origine
     const distance = Math.sqrt(screenX * screenX + screenY * screenY);
     const maxDistance = 1.5;
 
     if (distance > maxDistance) {
-      // Limiter les coordonnées à la distance maximale en fonction de l'angle
       screenX = maxDistance * Math.cos(radian);
       screenY = maxDistance * Math.sin(radian);
     }
@@ -71,7 +73,7 @@ const App = () => {
     setJoystickCoordsRepere({ x2: screenX, y2: screenY });
     setDataAngle(degree);
     setRadian(radian);
-    setDistance(distance); // <-- Utilisation de la distance calculée ici
+    setDistance(distance);
   };
 
   const angleDataMap = [
@@ -83,7 +85,7 @@ const App = () => {
     { angle: 225, data: [-200, -200, -4000, -4000] },
     { angle: 270, data: [-4000, -4000, -4000, -4000] },
     { angle: 315, data: [-4000, -4000, -200, -200] },
-    { angle: 360, data: [1000, 1000, -1000, 1000] }, // repeat the 0° value for simplicity
+    { angle: 360, data: [1000, 1000, -1000, 1000] },
   ];
 
   const interpolateData = (theta) => {
@@ -108,7 +110,7 @@ const App = () => {
 
   useEffect(() => {
     let commandData = interpolateData(dataAngle);
-    if (dist === 0) {
+    if (dist === 0 || !isRaceActive) {
       commandData = commandData.map(() => 0);
     } else {
       commandData = commandData.map((value) =>
@@ -120,16 +122,34 @@ const App = () => {
       cmd: 1,
       data: commandData,
     });
-  }, [dataAngle]);
 
-  const handleButtonPress = () => {
-    // Envoyer la première commande
-    sendCommand({ cmd: 1, data: [0, 200, 4000, 4000] });
+    // calcul vitesse
+    const maxValue = Math.max(...commandData.map(Math.abs));
+    const maxSpeedKmH = 10;
+    const currentSpeed = (maxValue / 4095) * maxSpeedKmH;
+    setSpeed(currentSpeed);
 
-    // Attendre 1 seconde, puis envoyer la seconde commande
-    setTimeout(() => {
-      sendCommand({ cmd: 1, data: [0, 0, 0, 0] });
-    }, 500); // 1000 millisecondes = 1 seconde
+    // calcul de la distance parcourue
+    const now = Date.now();
+    const timeElapsedInSeconds = (now - lastUpdateTimeRef.current) / 1000;
+    lastUpdateTimeRef.current = now;
+
+    if (isRaceActive) {
+      const distanceTraveled = (currentSpeed * timeElapsedInSeconds) / 3600; // km
+      setTotalDistance((prevDistance) => prevDistance + distanceTraveled);
+    }
+  }, [dataAngle, dist, isRaceActive]);
+
+  const toggleRace = () => {
+    if (isRaceActive) {
+      // arrête la course
+      setIsRaceActive(false);
+    } else {
+      // lance une course
+      setIsRaceActive(true);
+      setTotalDistance(0); // reset distance parcourue
+      lastUpdateTimeRef.current = Date.now(); // reset temps de référence
+    }
   };
 
   return (
@@ -141,7 +161,7 @@ const App = () => {
         backgroundColor: "#038ac9",
       }}
     >
-      <Text>{message}</Text> {/* Affichage de l'état de la connexion */}
+      <Text>{message}</Text>
       <ReactNativeJoystick
         onMove={handleJoystickMove}
         onStop={handleJoystickMove}
@@ -159,10 +179,14 @@ const App = () => {
       </Text>
       <Text>Angle : ({dataAngle})</Text>
       <Text>Radian : ({radian})</Text>
-      <Text>Distance : ({dist.toFixed(2)})</Text>{" "}
-      {/* Affichage de la distance avec un formattage */}
+      <Text>Distance : ({dist.toFixed(2)})</Text>
       <Text>Data : [{data.join(", ")}]</Text>
-      <Button title="Send Command" onPress={handleButtonPress} />
+      <Text>Vitesse : {speed.toFixed(2)} km/h</Text>
+      <Text>Distance parcourue : {totalDistance.toFixed(2)} km</Text>{" "}
+      <Button
+        title={isRaceActive ? "Arrêter la course" : "Commencer la course"}
+        onPress={toggleRace}
+      />
     </View>
   );
 };
