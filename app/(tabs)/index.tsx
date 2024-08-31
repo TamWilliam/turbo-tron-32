@@ -3,17 +3,7 @@ import { View, Text, Button } from "react-native";
 import { ReactNativeJoystick } from "@korsolutions/react-native-joystick";
 
 const App = () => {
-  const [joystickCoords, setJoystickCoords] = useState({ x: 0, y: 0 });
-  const [joystickCoordsRepere, setJoystickCoordsRepere] = useState({
-    x2: 0,
-    y2: 0,
-  });
-  const [dataAngle, setDataAngle] = useState(0);
-  const [radian, setRadian] = useState(0);
   const [ws, setWs] = useState(null);
-  const [data, setData] = useState([0, 0, 0, 0]);
-  const [dist, setDistance] = useState(0);
-  const [message, setMessage] = useState("Connecting...");
   const [speed, setSpeed] = useState(0);
   const [distanceTraveled, setDistanceTraveled] = useState(0);
   const [isRacing, setIsRacing] = useState(false);
@@ -25,7 +15,6 @@ const App = () => {
     websocket.onopen = () => {
       console.log("Connected to WebSocket server");
       setWs(websocket);
-      setMessage("Connected");
     };
 
     websocket.onmessage = (event) => {
@@ -34,12 +23,10 @@ const App = () => {
 
     websocket.onclose = () => {
       console.log("Disconnected from WebSocket server");
-      setMessage("Disconnected");
     };
 
     websocket.onerror = (error) => {
       console.error("WebSocket error:", error);
-      setMessage("Error");
     };
 
     return () => {
@@ -54,99 +41,33 @@ const App = () => {
   };
 
   const handleJoystickMove = (data) => {
-    let { x, y } = data.position;
-    let { screenX, screenY } = data.position;
-    const { degree, radian } = data.angle;
+    const { degree } = data.angle;
 
-    const distance = Math.sqrt(screenX * screenX + screenY * screenY);
-    const maxDistance = 1.5;
+    const maxSpeedKmH = 10;
+    const ratio = degree / 360;
+    const currentSpeed = ratio * maxSpeedKmH;
 
-    if (distance > maxDistance) {
-      screenX = maxDistance * Math.cos(radian);
-      screenY = maxDistance * Math.sin(radian);
-    }
+    setSpeed(currentSpeed);
 
-    screenX = (screenX / maxDistance) * 100;
-    screenY = (screenY / maxDistance) * 100;
-
-    setJoystickCoords({ x, y });
-    setJoystickCoordsRepere({ x2: screenX, y2: screenY });
-    setDataAngle(degree);
-    setRadian(radian);
-    setDistance(distance);
-  };
-
-  const angleDataMap = [
-    { angle: 0, data: [1000, 1000, -1000, -1000] },
-    { angle: 45, data: [4000, 4000, 200, 200] },
-    { angle: 90, data: [4000, 4000, 4000, 4000] },
-    { angle: 135, data: [200, 200, 4000, 4000] },
-    { angle: 180, data: [0, 0, 1000, 1000] },
-    { angle: 225, data: [-200, -200, -4000, -4000] },
-    { angle: 270, data: [-4000, -4000, -4000, -4000] },
-    { angle: 315, data: [-4000, -4000, -200, -200] },
-    { angle: 360, data: [1000, 1000, -1000, 1000] },
-  ];
-
-  const interpolateData = (theta) => {
-    const lowerIndex = Math.floor(theta / 45);
-    const upperIndex = (lowerIndex + 1) % angleDataMap.length;
-
-    const lowerAngle = angleDataMap[lowerIndex].angle;
-    const upperAngle = angleDataMap[upperIndex].angle;
-
-    const lowerData = angleDataMap[lowerIndex].data;
-    const upperData = angleDataMap[upperIndex].data;
-
-    const ratio = (theta - lowerAngle) / (upperAngle - lowerAngle);
-
-    const interpolatedData = lowerData.map((lowerValue, index) => {
-      const upperValue = upperData[index];
-      return lowerValue + ratio * (upperValue - lowerValue);
-    });
-
-    return interpolatedData;
-  };
-
-  useEffect(() => {
-    let commandData = interpolateData(dataAngle);
-    if (dist === 0) {
-      commandData = commandData.map(() => 0);
-    } else {
-      commandData = commandData.map((value) =>
-        parseFloat((value * (dist / 1.41)).toFixed(2))
-      );
-    }
-    setData(commandData);
+    // Send speed data to the server
     sendCommand({
       cmd: 1,
-      data: commandData,
+      speed: currentSpeed.toFixed(2),
     });
+  };
 
-    // calcul de la vitesse
-    const maxValue = Math.max(...commandData.map(Math.abs));
-    const maxSpeedKmH = 10;
-    const currentSpeed = (maxValue / 4095) * maxSpeedKmH;
-    setSpeed(currentSpeed);
-  }, [joystickCoordsRepere]);
-
-  // distance parcourue
   useEffect(() => {
     if (isRacing && speed > 0) {
-      const id = setInterval(() => {
-        setDistanceTraveled((prevDistance) => prevDistance + speed / 3600);
-      }, 1000);
-
-      setIntervalId(id);
-    } else if (!isRacing && intervalId) {
-      clearInterval(intervalId);
-    }
-
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
+      if (!intervalId) {
+        const id = setInterval(() => {
+          setDistanceTraveled((prevDistance) => prevDistance + speed / 3600);
+        }, 1000);
+        setIntervalId(id);
       }
-    };
+    } else if (intervalId) {
+      clearInterval(intervalId);
+      setIntervalId(null);
+    }
   }, [isRacing, speed]);
 
   const toggleRace = () => {
@@ -158,14 +79,6 @@ const App = () => {
     }
   };
 
-  const handleButtonPress = () => {
-    sendCommand({ cmd: 1, data: [0, 200, 4000, 4000] });
-
-    setTimeout(() => {
-      sendCommand({ cmd: 1, data: [0, 0, 0, 0] });
-    }, 500);
-  };
-
   return (
     <View
       style={{
@@ -175,33 +88,12 @@ const App = () => {
         backgroundColor: "#038ac9",
       }}
     >
-      <Text>{message}</Text>
-      <ReactNativeJoystick
-        onMove={handleJoystickMove}
-        onStop={handleJoystickMove}
-        backgroundColor="#d9d9d9"
-        color="#959292"
-        radius={75}
-      />
-      <Text>
-        Coordonnées du joystick : ({joystickCoords.x.toFixed(2)},{" "}
-        {joystickCoords.y.toFixed(2)})
-      </Text>
-      <Text>
-        Coordonnées : ({joystickCoordsRepere.x2.toFixed(2)},{" "}
-        {joystickCoordsRepere.y2.toFixed(2)})
-      </Text>
-      <Text>Angle : ({dataAngle})</Text>
-      <Text>Radian : ({radian})</Text>
-      <Text>Distance : ({dist.toFixed(2)})</Text>
-      <Text>Data : [{data.join(", ")}]</Text>
-      <Text>Vitesse : {speed.toFixed(2)} km/h</Text>
-      <Text>Distance parcourue : {distanceTraveled.toFixed(2)} km</Text>{" "}
+      <Text>Vitesse : {speed.toFixed(3)} km/h</Text>
+      <Text>Distance parcourue : {distanceTraveled.toFixed(3)} km</Text>{" "}
       <Button
         title={isRacing ? "Arrêter la course" : "Commencer la course"}
         onPress={toggleRace}
       />
-      <Button title="Send Command" onPress={handleButtonPress} />
     </View>
   );
 };
