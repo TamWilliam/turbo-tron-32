@@ -128,19 +128,19 @@ const App = () => {
       data: commandData,
     });
 
-    // Calcul de la vitesse
+    // calcul de la vitesse
     const maxValue = Math.max(...commandData.map(Math.abs));
     const maxSpeedKmH = 10;
     const currentSpeed = (maxValue / 4095) * maxSpeedKmH;
     setSpeed(currentSpeed);
   }, [joystickCoordsRepere]);
 
-  // Distance parcourue
+  // distance parcourue
   useEffect(() => {
     if (isRacing && speed > 0) {
       const id = setInterval(() => {
-        setDistanceTraveled((prevDistance) => prevDistance + speed / 3600);
-      }, 1000);
+        setDistanceTraveled((prevDistance) => prevDistance + speed);
+      }, 100);
 
       setIntervalId(id);
     } else {
@@ -165,15 +165,8 @@ const App = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.joystickContainer}>
-        <ReactNativeJoystick
-          onMove={handleJoystickMove}
-          onStop={handleJoystickMove}
-          backgroundColor="#d9d9d9"
-          color="#959292"
-          radius={75}
-        />
-      </View>
+      <View style={styles.joystickContainer}></View>
+      <View style={styles.cameraContainer}></View>
       <View style={styles.infoContainer}>
         <View style={styles.circleContainer}>
           <Text style={styles.labelText}>Vitesse</Text>
@@ -200,6 +193,10 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     backgroundColor: "#038ac9",
+  },
+  cameraContainer: {
+    flex: 2,
+    margin: 10,
   },
   joystickContainer: {
     justifyContent: "center",

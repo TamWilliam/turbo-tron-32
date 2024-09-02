@@ -1,55 +1,37 @@
-import React, { useEffect, useRef } from "react";
-import { Text, View, StyleSheet } from "react-native";
-import { Video } from "expo-av";
+import React from "react";
+import { View, Text, Platform, StyleSheet, Dimensions } from "react-native";
+import { WebView } from "react-native-webview";
 
 const App = () => {
-  const videoRef = useRef(null);
-
-  useEffect(() => {
-    // Access the video reference
-    // console.log(videoRef.current);
-  }, []);
-
   return (
-    <View style={{ flexGrow: 1, flex: 1 }}>
-      <Text style={styles.mainTitle}>AC Video Player</Text>
-      <View style={{ flex: 1 }}>
-        <Video
-          source={{
-            uri: "https://www.aranacorp.com/wp-content/uploads/rovy-avoiding-obstacles.mp4",
-          }} // Distant file
-          ref={videoRef} // Store reference
-          shouldPlay
-          resizeMode="cover"
-          onPlaybackStatusUpdate={(status) => {
-            console.log(status);
-          }}
-          style={styles.backgroundVideo}
+    <View style={styles.container}>
+      {Platform.OS === "android" || Platform.OS === "ios" ? (
+        <WebView
+          source={{ uri: "http://192.168.225.240:7000/" }}
+          style={styles.webview}
         />
-      </View>
+      ) : (
+        <Text style={styles.errorText}>erreur liée à la plateforme</Text>
+      )}
     </View>
   );
 };
 
 export default App;
 
-const BACKGROUND_COLOR = "#161616"; //191A19
-const BUTTON_COLOR = "#346751"; //1E5128
-const ERROR_COLOR = "#C84B31"; //4E9F3D
-const TEXT_COLOR = "#ECDBBA"; //D8E9A8
 const styles = StyleSheet.create({
-  mainTitle: {
-    color: TEXT_COLOR,
-    fontSize: 30,
-    textAlign: "center",
-    borderBottomWidth: 2,
-    borderBottomColor: ERROR_COLOR,
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#000",
   },
-  backgroundVideo: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    bottom: 0,
-    right: 0,
+  webview: {
+    width: Dimensions.get("window").width,
+    height: Dimensions.get("window").height,
+  },
+  errorText: {
+    color: "red",
+    fontSize: 18,
   },
 });
