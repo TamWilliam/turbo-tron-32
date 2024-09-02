@@ -165,7 +165,15 @@ const App = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.joystickContainer}></View>
+      <View style={styles.joystickContainer}>
+        <ReactNativeJoystick
+          onMove={handleJoystickMove}
+          onStop={handleJoystickMove}
+          backgroundColor="#d9d9d9"
+          color="#959292"
+          radius={75}
+        />
+      </View>
       <View style={styles.cameraContainer}></View>
       <View style={styles.infoContainer}>
         <View style={styles.circleContainer}>
@@ -183,6 +191,13 @@ const App = () => {
         <TouchableOpacity style={styles.playStopButton} onPress={toggleRace}>
           <Text style={styles.buttonText}>{isRacing ? "❚❚" : "▶"}</Text>
         </TouchableOpacity>
+      </View>
+      <View>
+        <iframe
+          src="http://192.168.225.240:7000/"
+          style={{ width: "100%", height: 1000 }}
+          allow="fullscreen"
+        ></iframe>
       </View>
     </View>
   );
