@@ -21,15 +21,49 @@
 // https://randomnerdtutorials.com/esp32-static-fixed-ip-address-arduino-ide/
 // https://github.com/Freenove/Freenove_4WD_Car_Kit_for_ESP32/tree/master
 
-char *ssid_wifi = "Tenda_EXT";            // Le nom du réseau WiFi
-char *password_wifi = "doremi2711"; // Le password du WiFi
+/* Wifi Pierre */
+/* char *ssid_wifi = "Galaxy A13 A7C0"; // Le nom du réseau WiFi
+char *password_wifi = "zmwj0795";    // Le password du WiFi
 
-const char *mqtt_server = "82.64.159.229"; // L'IP de votre broker MQTT
+const char *mqtt_server = "192.168.225.160"; // L'IP de votre broker MQTT
+const int mqtt_interval_ms = 1000;           // L'interval en ms entre deux envois de données
+
+IPAddress localIP(192, 168, 225, 240); // l'IP que vous voulez donner à votre voiture
+
+IPAddress localGateway(192, 168, 225, 12); // L'IP de la gateway de votre réseau
+IPAddress localSubnet(255, 255, 255, 0);   // Le masque de sous réseau
+
+IPAddress primaryDNS(8, 8, 8, 8);
+IPAddress secondaryDNS(8, 8, 4, 4); */
+
+/* Wifi William */
+/* char *ssid_wifi = "S20will";         // Le nom du réseau WiFi
+char *password_wifi = "12345678901"; // Le password du WiFi
+
+const char *mqtt_server = "10.93.161.82"; // L'IP de votre broker MQTT
+const int mqtt_interval_ms = 1000;        // L'interval en ms entre deux envois de données
+
+IPAddress localIP(10, 93, 161, 240); // l'IP que vous voulez donner à votre voiture
+
+IPAddress localGateway(10, 93, 160, 1);  // L'IP de la gateway de votre réseau
+IPAddress localSubnet(255, 255, 224, 0); // Le masque de sous réseau
+
+IPAddress primaryDNS(8, 8, 8, 8);
+IPAddress secondaryDNS(8, 8, 4, 4);
+
+AsyncWebServer server(80);
+AsyncWebSocket ws("/ws"); // Changez le nom de ce point d'accès pour "sécuriser" l'accès à votre voiture */
+
+/* Wifi Rémi */
+char *ssid_wifi = "Denji 3.0";     // Le nom du réseau WiFi
+char *password_wifi = "dawarchat"; // Le password du WiFi
+
+const char *mqtt_server = "192.168.85.160"; // L'IP de votre broker MQTT
 const int mqtt_interval_ms = 1000;          // L'interval en ms entre deux envois de données
 
-IPAddress localIP(192, 168, 0, 50); // l'IP que vous voulez donner à votre voiture
+IPAddress localIP(192, 168, 85, 170); // l'IP que vous voulez donner à votre voiture
 
-IPAddress localGateway(192, 168, 0, 254); // L'IP de la gateway de votre réseau
+IPAddress localGateway(192, 168, 85, 47); // L'IP de la gateway de votre réseau
 IPAddress localSubnet(255, 255, 255, 0);  // Le masque de sous réseau
 
 IPAddress primaryDNS(8, 8, 8, 8);
