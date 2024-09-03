@@ -21,7 +21,7 @@ const App = () => {
   const [intervalId, setIntervalId] = useState(null);
 
   useEffect(() => {
-    const websocket = new WebSocket("ws://192.168.225.240/ws");
+    const websocket = new WebSocket("ws://192.168.85.170/ws");
 
     websocket.onopen = () => {
       console.log("Connected to WebSocket server");
@@ -86,7 +86,7 @@ const App = () => {
     { angle: 45, data: [4000, 4000, 200, 200] },
     { angle: 90, data: [4000, 4000, 4000, 4000] },
     { angle: 135, data: [200, 200, 4000, 4000] },
-    { angle: 180, data: [0, 0, 1000, 1000] },
+    { angle: 180, data: [-1000, -1000, 1000, 1000] },
     { angle: 225, data: [-200, -200, -4000, -4000] },
     { angle: 270, data: [-4000, -4000, -4000, -4000] },
     { angle: 315, data: [-4000, -4000, -200, -200] },
@@ -130,7 +130,7 @@ const App = () => {
 
     // calcul de la vitesse
     const maxValue = Math.max(...commandData.map(Math.abs));
-    const maxSpeedKmH = 10;
+    const maxSpeedKmH = 5;
     const currentSpeed = (maxValue / 4095) * maxSpeedKmH;
     setSpeed(currentSpeed);
   }, [joystickCoordsRepere]);
@@ -139,7 +139,8 @@ const App = () => {
   useEffect(() => {
     if (isRacing && speed > 0) {
       const id = setInterval(() => {
-        setDistanceTraveled((prevDistance) => prevDistance + speed);
+        const distanceIncrement = (speed / 3600) * 0.1;
+        setDistanceTraveled((prevDistance) => prevDistance + distanceIncrement);
       }, 100);
 
       setIntervalId(id);
@@ -165,6 +166,13 @@ const App = () => {
 
   return (
     <View style={styles.container}>
+      <View>
+        <iframe
+          src="http://192.168.85.170:7000/"
+          style={styles.cameraContainer}
+          allow="fullscreen"
+        ></iframe>
+      </View>
       <View style={styles.joystickContainer}>
         <ReactNativeJoystick
           onMove={handleJoystickMove}
@@ -192,13 +200,6 @@ const App = () => {
           <Text style={styles.buttonText}>{isRacing ? "❚❚" : "▶"}</Text>
         </TouchableOpacity>
       </View>
-      <View>
-        <iframe
-          src="http://192.168.225.240:7000/"
-          style={{ width: "100%", height: 1000 }}
-          allow="fullscreen"
-        ></iframe>
-      </View>
     </View>
   );
 };
@@ -210,8 +211,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#038ac9",
   },
   cameraContainer: {
-    flex: 2,
-    margin: 10,
+    height: 500,
+    width: 500,
   },
   joystickContainer: {
     justifyContent: "center",
