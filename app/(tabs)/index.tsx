@@ -128,26 +128,6 @@ const App = () => {
       data: commandData,
     });
 
-    // vérif de l'angle pour savoir si on tourne à droite ou à gauche
-    if (dataAngle >= 315 || dataAngle <= 45) {
-      // droite
-      sendCommand({
-        cmd: 3,
-        data: [0, 90],
-      });
-    } else if (dataAngle >= 135 && dataAngle <= 225) {
-      // gauche
-      sendCommand({
-        cmd: 3,
-        data: [180, 90],
-      });
-    } else {
-      sendCommand({
-        cmd: 3,
-        data: [90, 90],
-      });
-    }
-
     // calcul de la vitesse
     const maxValue = Math.max(...commandData.map(Math.abs));
     const maxSpeedKmH = 5;
