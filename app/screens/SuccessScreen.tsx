@@ -28,4 +28,22 @@ const SuccessScreen: React.FC<SuccessScreenProps> = ({ route, navigation }) => {
   );
 };
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "white",
+  },
+  image: {
+    width: 100,
+    height: 100,
+    marginBottom: 20,
+  },
+  text: {
+    fontSize: 18,
+    color: "black",
+  },
+});
+
 export default SuccessScreen;

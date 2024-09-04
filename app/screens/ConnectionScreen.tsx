@@ -139,6 +139,7 @@ const ConnectionScreen: React.FC<ConnectionScreenProps> = ({ navigation }) => {
       )}
       <Text style={styles.status}>Status: {connectionStatus}</Text>
     </KeyboardAvoidingView>
+
   );
 };
 
