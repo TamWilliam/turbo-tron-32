@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Button, StyleSheet } from "react-native";
+import { View, Text, Button, StyleSheet, Dimensions } from "react-native";
 import { ReactNativeJoystick } from "@korsolutions/react-native-joystick";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
@@ -166,13 +166,6 @@ const App = () => {
 
   return (
     <View style={styles.container}>
-      <View>
-        <iframe
-          src="http://192.168.85.170:7000/"
-          style={styles.cameraContainer}
-          allow="fullscreen"
-        ></iframe>
-      </View>
       <View style={styles.joystickContainer}>
         <ReactNativeJoystick
           onMove={handleJoystickMove}
@@ -182,7 +175,13 @@ const App = () => {
           radius={75}
         />
       </View>
-      <View style={styles.cameraContainer}></View>
+      <View>
+        <iframe
+          src="http://192.168.85.170:7000/"
+          style={styles.cameraContainer}
+          allow="fullscreen"
+        ></iframe>
+      </View>
       <View style={styles.infoContainer}>
         <View style={styles.circleContainer}>
           <Text style={styles.labelText}>Vitesse</Text>
@@ -196,9 +195,14 @@ const App = () => {
             <Text style={styles.valueText}>{distanceTraveled.toFixed(3)}</Text>
           </View>
         </View>
-        <TouchableOpacity style={styles.playStopButton} onPress={toggleRace}>
-          <Text style={styles.buttonText}>{isRacing ? "❚❚" : "▶"}</Text>
-        </TouchableOpacity>
+        <View style={styles.circleContainer}>
+        <Text style={styles.labelText}> </Text>
+          <View style={styles.circle}>
+            <TouchableOpacity style={styles.playStopButton} onPress={toggleRace}>
+              <Text style={styles.buttonText}>{isRacing ? "❚❚" : "▶"}</Text>
+            </TouchableOpacity>
+            </View>
+        </View>
       </View>
     </View>
   );
@@ -209,32 +213,33 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     backgroundColor: "#038ac9",
+    alignItems: "center",
   },
   cameraContainer: {
-    height: 500,
-    width: 500,
+    height: Dimensions.get("window").height*0.8,
+    width: Dimensions.get("window").width*0.6,
   },
   joystickContainer: {
     justifyContent: "center",
     alignItems: "center",
+    margin: 50,
     width: 100,
     marginLeft: 50,
   },
   infoContainer: {
     flex: 1,
     flexDirection: "row",
-    justifyContent: "flex-end",
-    alignItems: "flex-end",
-    marginBottom: 10,
-    marginRight: 10,
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
+    margin: 30,
   },
   circleContainer: {
     alignItems: "center",
     marginHorizontal: 10,
   },
   circle: {
-    width: 150,
-    height: 150,
+    width: 100,
+    height: 100,
     borderRadius: 75,
     borderWidth: 8,
     borderColor: "white",
@@ -243,7 +248,7 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
   valueText: {
-    fontSize: 40,
+    fontSize: 30,
     color: "white",
     fontWeight: "900",
   },
@@ -255,8 +260,8 @@ const styles = StyleSheet.create({
   playStopButton: {
     borderWidth: 8,
     borderColor: "white",
-    width: 150,
-    height: 150,
+    width: 100,
+    height: 100,
     borderRadius: 75,
     justifyContent: "center",
     alignItems: "center",
