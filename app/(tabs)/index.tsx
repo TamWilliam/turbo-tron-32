@@ -132,7 +132,7 @@ const App = () => {
 
     // calcul de la vitesse
     const maxValue = Math.max(...commandData.map(Math.abs));
-    const maxSpeedKmH = 5;
+    const maxSpeedKmH = 3.5;
     const currentSpeed = (maxValue / 4095) * maxSpeedKmH;
     setSpeed(currentSpeed);
   }, [joystickCoordsRepere]);
@@ -198,12 +198,15 @@ const App = () => {
           </View>
         </View>
         <View style={styles.circleContainer}>
-        <Text style={styles.labelText}> </Text>
+          <Text style={styles.labelText}> </Text>
           <View style={styles.circle}>
-            <TouchableOpacity style={styles.playStopButton} onPress={toggleRace}>
+            <TouchableOpacity
+              style={styles.playStopButton}
+              onPress={toggleRace}
+            >
               <Text style={styles.buttonText}>{isRacing ? "❚❚" : "▶"}</Text>
             </TouchableOpacity>
-            </View>
+          </View>
         </View>
       </View>
     </View>
@@ -218,8 +221,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   cameraContainer: {
-    height: Dimensions.get("window").height*0.8,
-    width: Dimensions.get("window").width*0.6,
+    height: Dimensions.get("window").height * 0.8,
+    width: Dimensions.get("window").width * 0.6,
   },
   joystickContainer: {
     justifyContent: "center",
