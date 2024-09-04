@@ -195,6 +195,14 @@ void loop()
         // dtostrf(Get_Battery_Voltage(), 5, 2, buff);
         // client.publish("esp32/battery", buff);
 
+        // arrêt si distance < 250
+        float distance = Get_Sonar();
+
+        if (distance < 250)
+        {
+            Motor_Move(0, 0, 0, 0);
+        }
+
         // Track Read
         Track_Read();
         sensor_v = static_cast<int>(sensorValue[3]);
