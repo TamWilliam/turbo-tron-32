@@ -36,6 +36,7 @@ const App = () => {
     websocket.onclose = () => {
       console.log("Disconnected from WebSocket server");
       setMessage("Disconnected");
+      setTimeout(websocket, 3000);
     };
 
     websocket.onerror = (error) => {
