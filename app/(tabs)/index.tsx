@@ -56,9 +56,10 @@ const App = () => {
   };
 
   const handleJoystickMove = (data) => {
-    let { x, y } = data.position;
-    let { screenX, screenY } = data.position;
-    const { degree, radian } = data.angle;
+    if (!data || !data.position) return;
+    let { x = 0, y = 0 } = data.position;
+    let { screenX = 0, screenY = 0 } = data.position;
+    const { degree = 0, radian = 0 } = data.angle || {};
 
     const distance = Math.sqrt(screenX * screenX + screenY * screenY);
     const maxDistance = 1.5;
