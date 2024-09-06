@@ -9,10 +9,17 @@ const WebSocketExample = () => {
     // Remplacez l'URL par l'URL de votre serveur WebSocket
     const websocket = new WebSocket("ws://192.168.225.240/ws");
 
-    websocket.onopen = () => {
+    const startConnection= () => { 
+      websocket.onopen = () => {
       console.log("WebSocket connection opened");
       setMessage("Connected");
-    };
+    };}
+
+    const stopConnection= () => { 
+      websocket.onopen = () => {
+      console.log("WebSocket connection opened");
+      setMessage("Connected");
+    };}
 
     websocket.onmessage = (e) => {
       console.log("Message received: ", e.data);
@@ -37,37 +44,11 @@ const WebSocketExample = () => {
     };
   }, []);
 
-  const sendStart = () => {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      const message = {
-        cmd: 9,
-        data: 1,
-      };
-      ws.send(JSON.stringify(message));
-      console.log("Message sent: ", message);
-    } else {
-      console.log("WebSocket is not open");
-    }
-  };
-
-  const sendStop = () => {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      const message = {
-        cmd: 9,
-        data: 0,
-      };
-      ws.send(JSON.stringify(message));
-      console.log("Message sent: ", message);
-    } else {
-      console.log("WebSocket is not open");
-    }
-  };
-
   return (
     <View>
       <Text>{message}</Text>
-      <Button title="Start" onPress={sendStart} />
-      <Button title="Stop" onPress={sendStop} />
+      <Button title="Start" onPress={startConnection} />
+      <Button title="Stop" onPress={stopConnection} />
     </View>
   );
 };

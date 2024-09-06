@@ -4,49 +4,63 @@ import { ReactNativeJoystick } from "@korsolutions/react-native-joystick";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 const App = () => {
-  const [joystickCoords, setJoystickCoords] = useState({ x: 0, y: 0 });
-  const [joystickCoordsRepere, setJoystickCoordsRepere] = useState({
-    x2: 0,
-    y2: 0,
-  });
-  const [dataAngle, setDataAngle] = useState(0);
-  const [radian, setRadian] = useState(0);
-  const [ws, setWs] = useState(null);
-  const [data, setData] = useState([0, 0, 0, 0]);
-  const [dist, setDistance] = useState(0);
-  const [message, setMessage] = useState("Connecting...");
+  // États pour le joystick de déplacement
+  const [joystickCoordsMove, setJoystickCoordsMove] = useState({ x: 0, y: 0 });
+  const [dataAngleMove, setDataAngleMove] = useState(0);
+  const [distMove, setDistanceMove] = useState(0);
   const [speed, setSpeed] = useState(0);
+
+  // États pour le joystick de caméra
+  const [joystickCoordsCamera, setJoystickCoordsCamera] = useState({ x: 0, y: 0 });
+  const [dataAngleCamera, setDataAngleCamera] = useState(0);
+  const [distCamera, setDistanceCamera] = useState(0);
+  const [dataCamera, setDataCamera] = useState([90, 90]);
+
+  const [ws, setWs] = useState(null);
+  const [message, setMessage] = useState("Connecting...");
   const [distanceTraveled, setDistanceTraveled] = useState(0);
   const [isRacing, setIsRacing] = useState(false);
   const [intervalId, setIntervalId] = useState(null);
+  const [reconnectAttempts, setReconnectAttempts] = useState(0);
 
   useEffect(() => {
-    const websocket = new WebSocket("ws://192.168.225.240/ws");
+    const connectWebSocket = () => {
+      const websocket = new WebSocket("ws://192.168.225.240/ws");
 
-    websocket.onopen = () => {
-      console.log("Connected to WebSocket server");
-      setWs(websocket);
-      setMessage("Connected");
+      websocket.onopen = () => {
+        console.log("Connected to WebSocket server");
+        setWs(websocket);
+        setMessage("Connected");
+        setReconnectAttempts(0); // Reset on successful connection
+      };
+
+      websocket.onmessage = (event) => {
+        console.log("Received:", event.data);
+      };
+
+      websocket.onclose = () => {
+        console.log("Disconnected from WebSocket server");
+        setMessage("Disconnected");
+        if (reconnectAttempts < 5) {
+          setReconnectAttempts(reconnectAttempts + 1);
+          setTimeout(connectWebSocket, 2000); // Retry connection after 2 seconds
+        } else {
+          setMessage("Failed to reconnect after 5 attempts.");
+        }
+      };
+
+      websocket.onerror = (error) => {
+        console.error("WebSocket error:", error);
+        setMessage("Error");
+      };
+
+      return () => {
+        websocket.close();
+      };
     };
 
-    websocket.onmessage = (event) => {
-      console.log("Received:", event.data);
-    };
-
-    websocket.onclose = () => {
-      console.log("Disconnected from WebSocket server");
-      setMessage("Disconnected");
-    };
-
-    websocket.onerror = (error) => {
-      console.error("WebSocket error:", error);
-      setMessage("Error");
-    };
-
-    return () => {
-      websocket.close();
-    };
-  }, []);
+    connectWebSocket();
+  }, [reconnectAttempts]);
 
   const sendCommand = (command) => {
     if (ws && ws.readyState === WebSocket.OPEN) {
@@ -54,45 +68,51 @@ const App = () => {
     }
   };
 
-  const handleJoystickMove = (data) => {
+  // Gestion du joystick de déplacement
+  const handleMoveJoystick = (data) => {
     let { x, y } = data.position;
-    let { screenX, screenY } = data.position;
     const { degree, radian } = data.angle;
 
-    const distance = Math.sqrt(screenX * screenX + screenY * screenY);
+    const distance = Math.sqrt(x * x + y * y);
     const maxDistance = 1.5;
 
     if (distance > maxDistance) {
-      screenX = maxDistance * Math.cos(radian);
-      screenY = maxDistance * Math.sin(radian);
+      x = maxDistance * Math.cos(radian);
+      y = maxDistance * Math.sin(radian);
     }
 
-    screenX = (screenX / maxDistance) * 100;
-    screenY = (screenY / maxDistance) * 100;
-
-    setJoystickCoords({ x, y });
-    setJoystickCoordsRepere({ x2: screenX, y2: screenY });
-    setDataAngle(degree);
-    setRadian(radian);
-    setDistance(distance);
+    setJoystickCoordsMove({ x, y });
+    setDataAngleMove(degree);
+    setDistanceMove(distance);
 
     if (distance === 0) {
       setSpeed(0);
     }
   };
 
-  const angleDataMap = [
-    { angle: 0, data: [1000, 1000, -1000, -1000] },
-    { angle: 45, data: [4000, 4000, 200, 200] },
-    { angle: 90, data: [4000, 4000, 4000, 4000] },
-    { angle: 135, data: [200, 200, 4000, 4000] },
-    { angle: 180, data: [0, 0, 1000, 1000] },
-    { angle: 225, data: [-200, -200, -4000, -4000] },
-    { angle: 270, data: [-4000, -4000, -4000, -4000] },
-    { angle: 315, data: [-4000, -4000, -200, -200] },
-    { angle: 360, data: [1000, 1000, -1000, 1000] },
-  ];
+  // Gestion du joystick de caméra
+  const handleCameraJoystick = (data) => {
+    let { x, y } = data.position;
+    const { degree, radian } = data.angle;
 
+    const distance = Math.sqrt(x * x + y * y);
+    const maxDistance = 1.5;
+
+    if (distance > maxDistance) {
+      x = maxDistance * Math.cos(radian);
+      y = maxDistance * Math.sin(radian);
+    }
+
+    setJoystickCoordsCamera({ x, y });
+    setDataAngleCamera(degree);
+    setDistanceCamera(distance);
+
+    if (distance === 0) {
+      setSpeed(0);
+    }
+  };
+
+  // Interpolation pour le joystick de déplacement
   const interpolateData = (theta) => {
     const lowerIndex = Math.floor(theta / 45);
     const upperIndex = (lowerIndex + 1) % angleDataMap.length;
@@ -113,29 +133,70 @@ const App = () => {
     return interpolatedData;
   };
 
+  // Interpolation pour le joystick de caméra
+  const interpolateDataCamera = (theta) => {
+    const lowerIndex = Math.floor(theta / 90);
+    const upperIndex = (lowerIndex + 1) % angleDataMapCamera.length;
+
+    const lowerAngle = angleDataMapCamera[lowerIndex].angle;
+    const upperAngle = angleDataMapCamera[upperIndex].angle;
+
+    const lowerData = angleDataMapCamera[lowerIndex].data;
+    const upperData = angleDataMapCamera[upperIndex].data;
+
+    const ratio = (theta - lowerAngle) / (upperAngle - lowerAngle);
+
+    const interpolatedData = lowerData.map((lowerValue, index) => {
+      const upperValue = upperData[index];
+      return lowerValue + ratio * (upperValue - lowerValue);
+    });
+
+    return interpolatedData;
+  };
+
+  // Effet pour envoyer les commandes du joystick de caméra
   useEffect(() => {
-    let commandData = interpolateData(dataAngle);
-    if (dist === 0) {
+    let commandDataCamera = interpolateDataCamera(dataAngleCamera);
+    if (distCamera === 0) {
+      commandDataCamera = commandDataCamera.map(() => 90);
+    } else {
+      commandDataCamera = commandDataCamera.map((value) =>
+        parseFloat((value).toFixed(2))
+      );
+    }
+    console.log(distCamera);
+    console.log(joystickCoordsCamera);
+    console.log(dataAngleCamera);
+    console.log(commandDataCamera);
+    sendCommand({
+      cmd: 3,
+      data: commandDataCamera,
+    });
+  }, [joystickCoordsCamera, dataAngleCamera, distCamera]); // Ajoutez toutes les dépendances ici
+
+  // Effet pour envoyer les commandes du joystick de déplacement
+  useEffect(() => {
+    let commandData = interpolateData(dataAngleMove);
+    if (distMove === 0) {
       commandData = commandData.map(() => 0);
     } else {
       commandData = commandData.map((value) =>
-        parseFloat((value * (dist / 1.41)).toFixed(2))
+        parseFloat((value * (distMove / 1.41)).toFixed(2))
       );
     }
-    setData(commandData);
     sendCommand({
       cmd: 1,
       data: commandData,
     });
 
-    // calcul de la vitesse
+    // Calcul de la vitesse
     const maxValue = Math.max(...commandData.map(Math.abs));
     const maxSpeedKmH = 10;
     const currentSpeed = (maxValue / 4095) * maxSpeedKmH;
     setSpeed(currentSpeed);
-  }, [joystickCoordsRepere]);
+  }, [joystickCoordsMove]);
 
-  // distance parcourue
+  // Gestion de la distance parcourue
   useEffect(() => {
     if (isRacing && speed > 0) {
       const id = setInterval(() => {
@@ -165,16 +226,34 @@ const App = () => {
 
   return (
     <View style={styles.container}>
+      <Text>{message}</Text>
+
       <View style={styles.joystickContainer}>
         <ReactNativeJoystick
-          onMove={handleJoystickMove}
-          onStop={handleJoystickMove}
+          onMove={handleMoveJoystick}
+          onStop={handleMoveJoystick}
           backgroundColor="#d9d9d9"
           color="#959292"
           radius={75}
         />
+        <Text style={styles.joystickLabel}>Joystick Déplacement</Text>
+        <Text style={styles.valueText}>
+        </Text>
       </View>
-      <View style={styles.cameraContainer}></View>
+
+      <View style={styles.joystickContainer}>
+        <ReactNativeJoystick
+          onMove={handleCameraJoystick}
+          onStop={handleCameraJoystick}
+          backgroundColor="#d9d9d9"
+          color="#959292"
+          radius={75}
+        />
+        <Text style={styles.joystickLabel}>Joystick Caméra</Text>
+        <Text style={styles.valueText}>
+        </Text>
+      </View>
+
       <View style={styles.infoContainer}>
         <View style={styles.circleContainer}>
           <Text style={styles.labelText}>Vitesse</Text>
@@ -182,87 +261,90 @@ const App = () => {
             <Text style={styles.valueText}>{speed.toFixed(3)}</Text>
           </View>
         </View>
+
         <View style={styles.circleContainer}>
           <Text style={styles.labelText}>Distance</Text>
           <View style={styles.circle}>
             <Text style={styles.valueText}>{distanceTraveled.toFixed(3)}</Text>
           </View>
         </View>
-        <TouchableOpacity style={styles.playStopButton} onPress={toggleRace}>
-          <Text style={styles.buttonText}>{isRacing ? "❚❚" : "▶"}</Text>
-        </TouchableOpacity>
       </View>
-      <View>
-        <iframe
-          src="http://192.168.225.240:7000/"
-          style={{ width: "100%", height: 1000 }}
-          allow="fullscreen"
-        ></iframe>
-      </View>
+
+      <TouchableOpacity onPress={toggleRace} style={styles.raceButton}>
+        <Text style={styles.buttonText}>{isRacing ? "Stop" : "Start"}</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
+const angleDataMap = [
+  { angle: 0, data: [1000, 1000, -1000, -1000] },
+  { angle: 45, data: [4000, 4000, 200, 200] },
+  { angle: 90, data: [4000, 4000, 4000, 4000] },
+  { angle: 135, data: [200, 200, 4000, 4000] },
+  { angle: 180, data: [0, 0, 1000, 1000] },
+  { angle: 225, data: [-200, -200, -4000, -4000] },
+  { angle: 270, data: [-4000, -4000, -4000, -4000] },
+  { angle: 315, data: [-4000, -4000, -200, -200] },
+  { angle: 360, data: [1000, 1000, -1000, -1000] },
+];
+
+
+const angleDataMapCamera = [
+  { angle: 0, data: [0, 180] },
+  { angle: 90, data: [90, 180] },
+  { angle: 180, data: [180, 90] },
+  { angle: 270, data: [90, 90] },
+  { angle: 360, data: [0, 90] },
+];
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: "row",
-    backgroundColor: "#038ac9",
-  },
-  cameraContainer: {
-    flex: 2,
-    margin: 10,
-  },
-  joystickContainer: {
     justifyContent: "center",
     alignItems: "center",
-    width: 100,
-    marginLeft: 50,
+    backgroundColor: "#038ac9",
+  },
+  joystickContainer: {
+    margin: 20,
+  },
+  joystickLabel: {
+    textAlign: "center",
+    marginTop: 10,
+    color: "#fff",
   },
   infoContainer: {
-    flex: 1,
     flexDirection: "row",
-    justifyContent: "flex-end",
-    alignItems: "flex-end",
-    marginBottom: 10,
-    marginRight: 10,
+    justifyContent: "space-between",
+    width: "80%",
+    marginVertical: 20,
   },
   circleContainer: {
     alignItems: "center",
-    marginHorizontal: 10,
-  },
-  circle: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    borderWidth: 8,
-    borderColor: "white",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "transparent",
-  },
-  valueText: {
-    fontSize: 40,
-    color: "white",
-    fontWeight: "900",
   },
   labelText: {
-    fontSize: 28,
-    color: "white",
-    marginBottom: 8,
+    fontSize: 18,
+    color: "#fff",
   },
-  playStopButton: {
-    borderWidth: 8,
-    borderColor: "white",
-    width: 150,
-    height: 150,
-    borderRadius: 75,
+  circle: {
+    borderRadius: 50,
+    width: 100,
+    height: 100,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#f0f0f0",
+  },
+  valueText: {
+    fontSize: 16,
+  },
+  raceButton: {
+    backgroundColor: "#007AFF",
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 20,
   },
   buttonText: {
-    color: "white",
-    fontSize: 50,
+    color: "#fff",
+    fontSize: 18,
   },
 });
 
