@@ -26,6 +26,8 @@ Dans votre gestionnaire de périphérique devrait s'afficher le port USB COM. Si
 
 #### Wifi
 
+##### Error 1
+
 ```shell
 [.pio\build\esp-wrover-kit\src\main.cpp.o] Error 1
 ```
@@ -50,6 +52,14 @@ IPAddress secondaryDNS(8, 8, 4, 4);
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 ```
+
+##### Error 2
+
+```shell
+Error 2: could not open /dev/ttyusb0 the port doesn't exist
+```
+
+Une variable upload_port contient ```/dev/ttyusb0```, supprimez cette ligne et tentez à nouveau d'upload votre code dans l'ESP32.
 
 ### Connexion WebSocket
 
