@@ -8,6 +8,7 @@ type RootStackParamList = {
   Connection: undefined;
   Success: undefined;
   Choice: undefined;
+  ManualControl: undefined;
 };
 
 type HomeScreenNavigationProp = NavigationProp<RootStackParamList, "Home">;
@@ -26,7 +27,7 @@ const HomeScreen: React.FC = () => {
         style={styles.button}
         onPress={() => {
           console.log("Bouton cliqué");
-          navigation.navigate("Connection");
+          navigation.navigate("ManualControl");
         }}
       >
         <Text style={styles.buttonText}>Commencer</Text>
