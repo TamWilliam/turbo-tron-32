@@ -2,8 +2,11 @@ import React, { useEffect, useState } from "react";
 import { View, Text, Button, StyleSheet, Dimensions } from "react-native";
 import { ReactNativeJoystick } from "@korsolutions/react-native-joystick";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
+import { RootStackParamList } from "../../types";
 
-const App = () => {
+const ManualControlScreen: React.FC = () => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [joystickCoords, setJoystickCoords] = useState({ x: 0, y: 0 });
   const [joystickCoordsRepere, setJoystickCoordsRepere] = useState({
     x2: 0,
@@ -207,6 +210,14 @@ const App = () => {
               <Text style={styles.buttonText}>{isRacing ? "❚❚" : "▶"}</Text>
             </TouchableOpacity>
           </View>
+          <Button
+          title="Voir les données télémétriques"
+          onPress={() => navigation.navigate("CarStatistics")}
+          />
+          <Button
+          title="Voir les courses"
+          onPress={() => navigation.navigate("RaceStats")}
+          />
         </View>
       </View>
     </View>
@@ -277,4 +288,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default App;
+export default ManualControlScreen;

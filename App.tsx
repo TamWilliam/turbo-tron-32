@@ -4,10 +4,12 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { View } from "react-native";
 import HomeScreen from "./app/screens/HomeScreen";
-import ConnectionScreen from "./app/screens/ConnectionScreen";
 import SuccessScreen from "./app/screens/SuccessScreen";
+import ConnectionScreen from "./app/screens/ConnectionScreen";
 import ManualControlScreen from "./app/screens/ManualControlScreen";
 import AutomaticControlScreen from "./app/screens/AutomaticControlScreen";
+import CarStatisticsScreen from "./app/screens/CarStatisticsScreen";
+import RaceStatsScreen from "./app/screens/RaceStatsScreen";
 import { RootStackParamList } from "./types";
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -33,13 +35,23 @@ const App = () => {
           name="Success"
           component={SuccessScreen}
           options={{
-            headerTitle: () => <View />, // Utiliser une vue vide pour supprimer le texte et garder l'icone
+            headerTitle: () => <View />,
           }}
         />
-        <Stack.Screen name="ManualControl" component={ManualControlScreen} />
         <Stack.Screen
-          name="AutomaticControl"
-          component={AutomaticControlScreen}
+          name="ManualControl"
+          component={ManualControlScreen}
+          options={{ title: "Connexion" }}
+        />
+        <Stack.Screen
+          name="CarStatistics"
+          component={CarStatisticsScreen}
+          options={{ title: "Données télémétriques" }}
+        />
+        <Stack.Screen
+          name="RaceStats"
+          component={RaceStatsScreen}
+          options={{ title: "Contrôle manuel" }}
         />
       </Stack.Navigator>
     </NavigationContainer>
