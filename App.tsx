@@ -8,7 +8,8 @@ import SuccessScreen from "./app/screens/SuccessScreen";
 import ConnectionScreen from "./app/screens/ConnectionScreen";
 import ManualControlScreen from "./app/screens/ManualControlScreen";
 import AutomaticControlScreen from "./app/screens/AutomaticControlScreen";
-import TelemetryDataScreen from "./app/screens/TelemetryDataScreen";
+import CarStatisticsScreen from "./app/screens/CarStatisticsScreen";
+import RaceStatsScreen from "./app/screens/RaceStatsScreen";
 import { RootStackParamList } from "./types";
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -43,8 +44,13 @@ const App = () => {
           options={{ title: "Connexion" }}
         />
         <Stack.Screen
-          name="TelemetryData"
-          component={TelemetryDataScreen}
+          name="CarStatistics"
+          component={CarStatisticsScreen}
+          options={{ title: "Données télémétriques" }}
+        />
+        <Stack.Screen
+          name="RaceStats"
+          component={RaceStatsScreen}
           options={{ title: "Contrôle manuel" }}
         />
       </Stack.Navigator>

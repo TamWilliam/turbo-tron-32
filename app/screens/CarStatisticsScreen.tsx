@@ -47,7 +47,7 @@ function SkiaComponent({ option }) {
   return <SkiaChart ref={skiaRef} />;
 }
 
-function App() {
+function CarStatistics() {
   const [trackData, setTrackData] = useState([]);
   const [sonarData, setSonarData] = useState([]);
   const [lightData, setLightData] = useState([]);
@@ -179,4 +179,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default gestureHandlerRootHOC(App);
+export default gestureHandlerRootHOC(CarStatistics);

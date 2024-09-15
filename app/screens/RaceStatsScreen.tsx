@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, ActivityIndicator, FlatList } from "react-native";
-import styles from "../styles/TelemetryDataScreenStyle";
+import styles from "../styles/RaceStatsScreenStyle";
 
-const TelemetryDataScreen: React.FC = () => {
+const RaceStatsScreen: React.FC = () => {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -33,7 +33,7 @@ const TelemetryDataScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Données télémétriques du véhicule</Text>
+      <Text style={styles.title}>Courses enregistrées</Text>
       {data.length > 0 ? (
         <FlatList
           data={data}
@@ -54,4 +54,4 @@ const TelemetryDataScreen: React.FC = () => {
   );
 };
 
-export default TelemetryDataScreen;
+export default RaceStatsScreen;

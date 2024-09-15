@@ -212,7 +212,11 @@ const ManualControlScreen: React.FC = () => {
           </View>
           <Button
           title="Voir les données télémétriques"
-          onPress={() => navigation.navigate("TelemetryData")}
+          onPress={() => navigation.navigate("CarStatistics")}
+          />
+          <Button
+          title="Voir les courses"
+          onPress={() => navigation.navigate("RaceStats")}
           />
         </View>
       </View>
