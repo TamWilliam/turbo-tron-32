@@ -1,20 +1,11 @@
 import React from "react";
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
+import { RootStackParamList } from "../../types";
 import styles from "../styles/HomeScreenStyle";
 
-type RootStackParamList = {
-  Home: undefined;
-  Connection: undefined;
-  Success: undefined;
-  Choice: undefined;
-  ManualControl: undefined;
-};
-
-type HomeScreenNavigationProp = NavigationProp<RootStackParamList, "Home">;
-
 const HomeScreen: React.FC = () => {
-  const navigation = useNavigation<HomeScreenNavigationProp>();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   return (
     <View style={styles.container}>

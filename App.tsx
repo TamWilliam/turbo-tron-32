@@ -2,16 +2,14 @@ import "react-native-gesture-handler";
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import { View } from "react-native";
 import HomeScreen from "./app/screens/HomeScreen";
 import SuccessScreen from "./app/screens/SuccessScreen";
 import ManualControlScreen from "./app/screens/ManualControlScreen";
+import AutomaticControlScreen from "./app/screens/AutomaticControlScreen";
+import CarStatisticsScreen from "./app/screens/CarStatistics";
+import { RootStackParamList } from "./types";
 import TelemetryDataScreen from "./app/screens/TelemetryDataScreen";
-type RootStackParamList = {
-  Home: undefined;
-  Success: undefined;
-  ManualControl: undefined;
-  TelemetryData: undefined;
-};
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -25,16 +23,26 @@ const App = () => {
           options={{ headerShown: false }}
         />
         <Stack.Screen
+          name="Connection"
+          component={ConnectionScreen}
+          options={{
+            title: "Connexion Véhicule",
+            headerTransparent: true,
+          }}
+        />
+        <Stack.Screen
           name="Success"
           component={SuccessScreen}
-          options={{ title: "Succès" }}
+          options={{
+            headerTitle: () => <View />, // Utiliser une vue vide pour supprimer le texte et garder l'icone
+          }}
         />
+        <Stack.Screen name="ManualControl" component={ManualControlScreen} />
+        <Stack.Screen name="CarStatistics" component={CarStatisticsScreen} />
         <Stack.Screen
           name="ManualControl"
           component={ManualControlScreen}
           options={{ title: "Connexion" }}
-        />
-        <Stack.Screen
           name="TelemetryData"
           component={TelemetryDataScreen}
           options={{ title: "Contrôle manuel" }}
