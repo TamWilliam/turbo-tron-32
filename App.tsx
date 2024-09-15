@@ -8,6 +8,7 @@ import ConnectionScreen from "./app/screens/ConnectionScreen";
 import SuccessScreen from "./app/screens/SuccessScreen";
 import ManualControlScreen from "./app/screens/ManualControlScreen";
 import AutomaticControlScreen from "./app/screens/AutomaticControlScreen";
+import CarStatisticsScreen from "./app/screens/CarStatistics";
 import { RootStackParamList } from "./types";
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -37,6 +38,7 @@ const App = () => {
           }}
         />
         <Stack.Screen name="ManualControl" component={ManualControlScreen} />
+        <Stack.Screen name="CarStatistics" component={CarStatisticsScreen} />
         <Stack.Screen
           name="AutomaticControl"
           component={AutomaticControlScreen}

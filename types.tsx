@@ -6,6 +6,7 @@ export type RootStackParamList = {
   Success: { controlMode: string };
   ManualControl: undefined;
   AutomaticControl: undefined;
+  CarStatistics: undefined;
 };
 
 export type HomeScreenNavigationProp = StackScreenProps<
@@ -28,4 +29,8 @@ export type ManualControlScreenProps = StackScreenProps<
 export type AutomaticControlScreenProps = StackScreenProps<
   RootStackParamList,
   "AutomaticControl"
+>;
+export type CarStatisticsScreenProps = StackScreenProps<
+  RootStackParamList,
+  "CarStatistics"
 >;
