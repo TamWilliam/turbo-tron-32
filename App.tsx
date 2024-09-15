@@ -5,11 +5,11 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { View } from "react-native";
 import HomeScreen from "./app/screens/HomeScreen";
 import SuccessScreen from "./app/screens/SuccessScreen";
+import ConnectionScreen from "./app/screens/ConnectionScreen";
 import ManualControlScreen from "./app/screens/ManualControlScreen";
 import AutomaticControlScreen from "./app/screens/AutomaticControlScreen";
-import CarStatisticsScreen from "./app/screens/CarStatistics";
-import { RootStackParamList } from "./types";
 import TelemetryDataScreen from "./app/screens/TelemetryDataScreen";
+import { RootStackParamList } from "./types";
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -34,15 +34,15 @@ const App = () => {
           name="Success"
           component={SuccessScreen}
           options={{
-            headerTitle: () => <View />, // Utiliser une vue vide pour supprimer le texte et garder l'icone
+            headerTitle: () => <View />,
           }}
         />
-        <Stack.Screen name="ManualControl" component={ManualControlScreen} />
-        <Stack.Screen name="CarStatistics" component={CarStatisticsScreen} />
         <Stack.Screen
           name="ManualControl"
           component={ManualControlScreen}
           options={{ title: "Connexion" }}
+        />
+        <Stack.Screen
           name="TelemetryData"
           component={TelemetryDataScreen}
           options={{ title: "Contrôle manuel" }}

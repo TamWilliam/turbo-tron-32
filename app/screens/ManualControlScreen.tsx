@@ -2,8 +2,11 @@ import React, { useEffect, useState } from "react";
 import { View, Text, Button, StyleSheet, Dimensions } from "react-native";
 import { ReactNativeJoystick } from "@korsolutions/react-native-joystick";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
+import { RootStackParamList } from "../../types";
 
-const ManualControlScreen = () => {
+const ManualControlScreen: React.FC = () => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [joystickCoords, setJoystickCoords] = useState({ x: 0, y: 0 });
   const [joystickCoordsRepere, setJoystickCoordsRepere] = useState({
     x2: 0,
