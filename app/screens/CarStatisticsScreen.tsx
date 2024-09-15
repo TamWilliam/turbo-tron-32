@@ -10,6 +10,7 @@ import {
   GridComponent,
 } from 'echarts/components';
 import mqtt from 'mqtt';
+import styles from '../styles/CarStatisticsScreenStyle';
 
 // MQTT Configuration
 const MQTT_URL = 'ws://192.168.86.53:9001'; // Utilisez 'ws' pour WebSocket
@@ -170,13 +171,5 @@ function CarStatistics() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
 
 export default gestureHandlerRootHOC(CarStatistics);
